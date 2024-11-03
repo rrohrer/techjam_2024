@@ -22,24 +22,20 @@ static void mainloop(void) {
       quit = true;
   }
 }
-int main(int argc, char **argv) {
-  UNREFERENCED_PARAMETER(argc);
-  UNREFERENCED_PARAMETER(argv);
+
+struct GraphicsContext {
+  SDL_Window *window;
+};
+
+bool init_graphics(struct GraphicsContext *graphics) {
+
   SDL_Window *window = NULL;
-  int exit_code = EXIT_SUCCESS;
-
-  if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-    printf("Could not initialize SDL! SDL_Error: %s\n", SDL_GetError());
-    return EXIT_FAILURE;
-  }
-
-  window = SDL_CreateWindow("Ferguson and the Half Robot",
-                            SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-                            SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+  window = SDL_CreateWindow("TechJam 2024", SDL_WINDOWPOS_UNDEFINED,
+                            SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH,
+                            SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
   if (NULL == window) {
     printf("Could not initialize SDL Window! SDL_Error: %s\n", SDL_GetError());
-    exit_code = EXIT_FAILURE;
-    goto cleanup;
+    return false;
   }
 
   // Request an OpenGL 3.3 context (should be core)
@@ -72,14 +68,34 @@ int main(int argc, char **argv) {
 #ifndef __EMSCRIPTEN__
   if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress)) {
     printf("Failed to initialize opengl...:%s\n", SDL_GetError());
-    exit_code = EXIT_FAILURE;
-    goto cleanup;
+    return false;
   }
 #endif
 
   glClearColor(0.2f, 0.3f, 0.3f, 1.f);
   glClear(GL_COLOR_BUFFER_BIT);
   SDL_GL_SwapWindow(window);
+
+  *graphics = (struct GraphicsContext){.window = window};
+  return true;
+}
+
+int main(int argc, char **argv) {
+  UNREFERENCED_PARAMETER(argc);
+  UNREFERENCED_PARAMETER(argv);
+  int exit_code = EXIT_SUCCESS;
+
+  if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+    printf("Could not initialize SDL! SDL_Error: %s\n", SDL_GetError());
+    return EXIT_FAILURE;
+  }
+
+  struct GraphicsContext graphics_context = {0};
+  if (!init_graphics(&graphics_context)) {
+    printf("Failed to initialize graphics\n");
+    exit_code = EXIT_FAILURE;
+    goto cleanup;
+  }
 
 #ifdef __EMSCRIPTEN__
   emscripten_set_main_loop(mainloop, 0, 1);
@@ -90,7 +106,7 @@ int main(int argc, char **argv) {
 #endif
 
 cleanup:
-  SDL_DestroyWindow(window);
+  SDL_DestroyWindow(graphics_context.window);
   SDL_Quit();
   return exit_code;
 }
