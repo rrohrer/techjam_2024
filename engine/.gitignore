@@ -1,2 +1,4 @@
+.cache/
 bin/
+web/
 compile_commands.json
