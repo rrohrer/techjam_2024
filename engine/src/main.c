@@ -11,13 +11,18 @@
 
 #define UNREFERENCED_PARAMETER(x) (void)x
 
-static bool quit = false;
+struct Core {
+  struct GraphicsContext graphics;
+  bool running;
+};
+
+static struct Core core;
 
 static void mainloop(void) {
   SDL_Event e;
   while (SDL_PollEvent(&e)) {
     if (e.type == SDL_QUIT)
-      quit = true;
+      core.running = false;
   }
 }
 
@@ -31,8 +36,7 @@ int main(int argc, char **argv) {
     return EXIT_FAILURE;
   }
 
-  struct GraphicsContext graphics_context = {0};
-  if (!graphics_context_new(&graphics_context)) {
+  if (!graphics_context_new(&core.graphics)) {
     printf("Failed to initialize graphics\n");
     exit_code = EXIT_FAILURE;
     goto cleanup;
@@ -41,13 +45,14 @@ int main(int argc, char **argv) {
 #ifdef __EMSCRIPTEN__
   emscripten_set_main_loop(mainloop, 0, 1);
 #else
-  while (!quit) {
+  core.running = true;
+  while (core.running) {
     mainloop();
   }
 #endif
 
 cleanup:
-  SDL_DestroyWindow(graphics_context.window);
+  SDL_DestroyWindow(core.graphics.window);
   SDL_Quit();
   return exit_code;
 }
