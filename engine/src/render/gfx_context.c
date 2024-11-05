@@ -1,0 +1,114 @@
+#include "render/gfx_context.h"
+#include "gl.h"
+#include "math/matrix4.h"
+#include "math/vector4.h"
+#include "platform/file.h"
+#include "render/gfx_api.h"
+#include "render/shader_files.h"
+
+#include <SDL.h>
+#include <stdlib.h>
+
+#define SCREEN_WIDTH 640
+#define SCREEN_HEIGHT 480
+
+static const GLfloat g_cube_data[] = {
+    -1.0f, -1.0f, -1.0f,                      // triangle 1 : begin
+    -1.0f, -1.0f, 1.0f,  -1.0f, 1.0f,  1.0f,  // triangle 1 : end
+    1.0f,  1.0f,  -1.0f,                      // triangle 2 : begin
+    -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  -1.0f, // triangle 2 : end
+    1.0f,  -1.0f, 1.0f,  -1.0f, -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f, 1.0f,
+    1.0f,  -1.0f, 1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, -1.0f,
+    -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f, 1.0f,  -1.0f, 1.0f,
+    -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f,
+    -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  -1.0f,
+    -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f, -1.0f, 1.0f,  1.0f,  1.0f,
+    1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  -1.0f, -1.0f,
+    1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f, -1.0f, 1.0f,
+    1.0f,  1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,  -1.0f, 1.0f};
+#define CUBE_TRIGANGLE_COUNT 12 * 3
+
+bool graphics_context_new(struct GraphicsContext *graphics) {
+  SDL_Window *window = NULL;
+  window = SDL_CreateWindow("TechJam 2024", SDL_WINDOWPOS_UNDEFINED,
+                            SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH,
+                            SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+  if (NULL == window) {
+    printf("Could not initialize SDL Window! SDL_Error: %s\n", SDL_GetError());
+    return false;
+  }
+
+  // Request an OpenGL 3.3 context (should be core)
+  SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+  // Also request a depth buffer
+  SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+  SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+
+#ifdef __EMSCRIPTEN__
+  EmscriptenWebGLContextAttributes attrs;
+  emscripten_webgl_init_context_attributes(
+      &attrs); // you MUST init the attributes before creating the context
+  attrs.antialias = true;
+  attrs.majorVersion = 2;
+  attrs.minorVersion = 0;
+  attrs.alpha = true;
+  attrs.powerPreference = EM_WEBGL_POWER_PREFERENCE_DEFAULT;
+
+  // The following lines must be done in exact order, or it will break!
+  EMSCRIPTEN_WEBGL_CONTEXT_HANDLE webgl_context =
+      emscripten_webgl_create_context("#canvas", &attrs);
+  emscripten_webgl_make_context_current(webgl_context);
+#endif
+
+  SDL_GL_CreateContext(window);
+
+#ifndef __EMSCRIPTEN__
+  if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress)) {
+    printf("Failed to initialize opengl...:%s\n", SDL_GetError());
+    return false;
+  }
+#endif
+
+  glClearColor(0.2f, 0.3f, 0.3f, 1.f);
+  glClear(GL_COLOR_BUFFER_BIT);
+
+  // float vertices[] = {-0.5f, -0.5f, 0.0f, 0.5f, -0.5f, 0.0f, 0.0f, 0.5f,
+  // 0.0f};
+  struct Mesh triangle = mesh_new();
+  mesh_fill(&triangle, g_cube_data, sizeof(g_cube_data));
+
+  struct File vs, fs;
+  if (!file_read_all(&vs, BASIC_VS_PATH) ||
+      !file_read_all(&fs, BASIC_FS_PATH)) {
+    printf("Could not find shader files\n");
+    return false;
+  }
+  struct Shader basic;
+  if (!shader_new(&basic, vs.data, fs.data)) {
+    printf("Could not compile shaders\n");
+    return false;
+  }
+
+  int width = SCREEN_WIDTH / 40;
+  int height = SCREEN_HEIGHT / 40;
+  struct Matrix4 m = Matrix4_orthographic(-width, width, -height, height);
+
+  shader_bind(&basic);
+
+  uint32_t m_loc = shader_get_uniform(&basic, "transform");
+  uint32_t color_loc = shader_get_uniform(&basic, "color");
+
+  shader_set_matrix_uniform(m_loc, &m);
+  struct Vector4 player_color = {1.f, 0.5f, 0.2f, 0.f};
+  shader_set_vector_uniform(color_loc, &player_color);
+  mesh_bind(&triangle);
+  glDrawArrays(GL_TRIANGLES, 0, CUBE_TRIGANGLE_COUNT);
+
+  SDL_GL_SwapWindow(window);
+
+  *graphics = (struct GraphicsContext){.window = window};
+  return true;
+}
