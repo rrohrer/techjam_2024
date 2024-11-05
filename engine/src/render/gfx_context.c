@@ -26,7 +26,6 @@ static const GLfloat g_cube_data[] = {
     1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  -1.0f, -1.0f,
     1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f, -1.0f, 1.0f,
     1.0f,  1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,  -1.0f, 1.0f};
-#define CUBE_TRIGANGLE_COUNT 12 * 3
 
 bool graphics_context_new(struct GraphicsContext *graphics) {
   SDL_Window *window = NULL;
@@ -37,6 +36,8 @@ bool graphics_context_new(struct GraphicsContext *graphics) {
     printf("Could not initialize SDL Window! SDL_Error: %s\n", SDL_GetError());
     return false;
   }
+  uint32_t width = SCREEN_WIDTH;
+  uint32_t height = SCREEN_HEIGHT;
 
   // Request an OpenGL 3.3 context (should be core)
   SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
@@ -77,8 +78,8 @@ bool graphics_context_new(struct GraphicsContext *graphics) {
 
   // float vertices[] = {-0.5f, -0.5f, 0.0f, 0.5f, -0.5f, 0.0f, 0.0f, 0.5f,
   // 0.0f};
-  struct Mesh triangle = mesh_new();
-  mesh_fill(&triangle, g_cube_data, sizeof(g_cube_data));
+  struct Mesh cube = mesh_new();
+  mesh_fill(&cube, g_cube_data, sizeof(g_cube_data));
 
   struct File vs, fs;
   if (!file_read_all(&vs, BASIC_VS_PATH) ||
@@ -86,29 +87,26 @@ bool graphics_context_new(struct GraphicsContext *graphics) {
     printf("Could not find shader files\n");
     return false;
   }
-  struct Shader basic;
-  if (!shader_new(&basic, vs.data, fs.data)) {
+  struct Shader basic_lighting;
+  if (!shader_new(&basic_lighting, vs.data, fs.data)) {
     printf("Could not compile shaders\n");
     return false;
   }
 
-  int width = SCREEN_WIDTH / 40;
-  int height = SCREEN_HEIGHT / 40;
-  struct Matrix4 m = Matrix4_orthographic(-width, width, -height, height);
+  shader_bind(&basic_lighting);
 
-  shader_bind(&basic);
-
-  uint32_t m_loc = shader_get_uniform(&basic, "transform");
-  uint32_t color_loc = shader_get_uniform(&basic, "color");
-
-  shader_set_matrix_uniform(m_loc, &m);
-  struct Vector4 player_color = {1.f, 0.5f, 0.2f, 0.f};
-  shader_set_vector_uniform(color_loc, &player_color);
-  mesh_bind(&triangle);
-  glDrawArrays(GL_TRIANGLES, 0, CUBE_TRIGANGLE_COUNT);
-
+  uint32_t basic_lighting_transform =
+      shader_get_uniform(&basic_lighting, "transform");
+  uint32_t basic_lighting_color = shader_get_uniform(&basic_lighting, "color");
   SDL_GL_SwapWindow(window);
 
-  *graphics = (struct GraphicsContext){.window = window};
+  *graphics = (struct GraphicsContext){
+      .window = window,
+      .width = width,
+      .height = height,
+      .basic_lighting = basic_lighting,
+      .basic_lighting_color = basic_lighting_color,
+      .basic_lighting_transform = basic_lighting_transform,
+      .cube = cube};
   return true;
 }
