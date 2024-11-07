@@ -154,10 +154,10 @@ struct Matrix4 Matrix4_lookat(struct Vector4 eye, struct Vector4 target,
   struct Vector4 f = Vector4_subtract(target, eye);
   Vector4_normalize(&f);
 
-  struct Vector4 s = Vector4_cross(f, up);
+  struct Vector4 s = Vector4_cross(up, f);
   Vector4_normalize(&s);
 
-  struct Vector4 u = Vector4_cross(s, f);
+  struct Vector4 u = Vector4_cross(f, s);
 
   struct Matrix4 r = Matrix4_identity();
   r.f11 = s.x;
@@ -166,12 +166,12 @@ struct Matrix4 Matrix4_lookat(struct Vector4 eye, struct Vector4 target,
   r.f12 = u.x;
   r.f22 = u.y;
   r.f32 = u.z;
-  r.f13 = -f.x;
-  r.f23 = -f.y;
-  r.f33 = -f.z;
-  r.f14 = -Vector4_dot(s, eye);
-  r.f24 = -Vector4_dot(u, eye);
-  r.f34 = Vector4_dot(f, eye);
+  r.f13 = f.x;
+  r.f23 = f.y;
+  r.f33 = f.z;
+  r.f41 = -Vector4_dot(s, eye);
+  r.f42 = -Vector4_dot(u, eye);
+  r.f43 = -Vector4_dot(f, eye);
 
   return r;
 }
@@ -228,13 +228,15 @@ struct Matrix4 Matrix4_orthographic_nf(float left, float right, float bottom,
 
 struct Matrix4 Matrix4_perspective(float fovy, float aspect_ratio, float near,
                                    float far) {
-  struct Matrix4 r = Matrix4_identity();
+  struct Matrix4 r = Matrix4_zero();
 
-  r.f11 = 1.f / (aspect_ratio * tanf(fovy / 2.f));
-  r.f22 = 1.f / tanf(fovy / 2.f);
-  r.f33 = -(far + near) / (far - near);
-  r.f34 = -(2.f * far * near) / (far - near);
-  r.f43 = -1.f;
+  float tanFovy2 = tanf(fovy / 2.f);
+
+  r.f11 = 1.f / (aspect_ratio * tanFovy2);
+  r.f22 = 1.f / tanFovy2;
+  r.f33 = (far + near) / (far - near);
+  r.f34 = 1.f;
+  r.f43 = -(2.f * far * near) / (far - near);
 
   return r;
 }
