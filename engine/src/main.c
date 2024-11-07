@@ -54,7 +54,6 @@ static void mainloop(void) {
               core.grid.origin.x + x, core.grid.origin.y + y,
               core.grid.origin.z + z);
           struct Matrix4 model = Matrix4_multiply(&m, &translation);
-          model = Matrix4_transpose(&model);
           shader_set_matrix_uniform(core.graphics.basic_lighting_transform,
                                     &model);
           // struct Vector4 player_color = {1.f, 0.5f, 0.2f, 0.f};

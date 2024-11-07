@@ -31,8 +31,8 @@
 struct Matrix4 {
   union {
     struct {
-      float f11, f21, f31, f41, f12, f22, f32, f42, f13, f23, f33, f43, f14,
-          f24, f34, f44;
+      float f11, f12, f13, f14, f21, f22, f23, f24, f31, f32, f33, f34, f41,
+          f42, f43, f44;
     };
     float f[16];
   };
