@@ -34,7 +34,7 @@ static void mainloop(void) {
   int height = core.graphics.height / 40;
   //  struct Matrix4 m = Matrix4_orthographic(-width, width, -height, height);
   struct Matrix4 p =
-      Matrix4_perspective(96.f, (float)width / (float)height, 0.1f, 150.f);
+      Matrix4_perspective(1.6f, (float)width / (float)height, 0.1f, 150.f);
   struct Matrix4 c = Matrix4_lookat(Vector4_new_point(10.f, 10.f, 10.f),
                                     Vector4_new_point(0.f, 0.f, 0.f),
                                     Vector4_new_vector(0.f, 1.f, 0.f));

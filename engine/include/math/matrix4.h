@@ -140,7 +140,7 @@ struct Matrix4 Matrix4_identity(void);
 struct Matrix4 Matrix4_invert(struct Matrix4 const *m);
 
 /**
- * Generate a camera matrix that is looking at a target.
+ * Generate a camera matrix that is looking at a target. RH
  *
  * @param eye - the location of the camera.
  * @param target - the target that the camera is focusing on.
@@ -188,7 +188,7 @@ struct Matrix4 Matrix4_orthographic_nf(float left, float right, float bottom,
 
 /**
  * Generates a perspective projection matrix. Behaves like gluPerspective (but
- * with radians).
+ * with radians). RH
  *
  * @param fovy - the vertical field of view of this projection.
  * @param aspect_ratio - the width:height ration of the projection.
