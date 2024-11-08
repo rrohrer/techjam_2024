@@ -23,3 +23,9 @@ only mat functions verified:
 - mul
 
 Everthing is right handed column major
+
+
+lighting:
+- pass multiple matrices into v shader to get frag pos (pc and m)
+- pass ambient dir and light dir into shader
+- calculate light in shader
