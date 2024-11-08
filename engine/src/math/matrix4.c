@@ -180,6 +180,7 @@ struct Matrix4 Matrix4_multiply(struct Matrix4 const *a,
                                 struct Matrix4 const *b) {
   struct Matrix4 m;
 
+  /* I think this is wrong becuase I goofed the memory ordering
   // row 1
   m.f11 = a->f11 * b->f11 + a->f12 * b->f21 + a->f13 * b->f31 + a->f14 * b->f41;
   m.f12 = a->f11 * b->f12 + a->f12 * b->f22 + a->f13 * b->f32 + a->f14 * b->f42;
@@ -203,7 +204,26 @@ struct Matrix4 Matrix4_multiply(struct Matrix4 const *a,
   m.f42 = a->f41 * b->f12 + a->f42 * b->f22 + a->f43 * b->f32 + a->f44 * b->f42;
   m.f43 = a->f41 * b->f13 + a->f42 * b->f23 + a->f43 * b->f33 + a->f44 * b->f43;
   m.f44 = a->f41 * b->f14 + a->f42 * b->f24 + a->f43 * b->f34 + a->f44 * b->f44;
+  */
+  m.f11 = a->f11 * b->f11 + a->f21 * b->f12 + a->f31 * b->f13 + a->f41 * b->f14;
+  m.f21 = a->f11 * b->f21 + a->f21 * b->f22 + a->f31 * b->f23 + a->f41 * b->f24;
+  m.f31 = a->f11 * b->f31 + a->f21 * b->f32 + a->f31 * b->f33 + a->f41 * b->f34;
+  m.f41 = a->f11 * b->f41 + a->f21 * b->f42 + a->f31 * b->f43 + a->f41 * b->f44;
 
+  m.f12 = a->f12 * b->f11 + a->f22 * b->f12 + a->f32 * b->f13 + a->f42 * b->f14;
+  m.f22 = a->f12 * b->f21 + a->f22 * b->f22 + a->f32 * b->f23 + a->f42 * b->f24;
+  m.f32 = a->f12 * b->f31 + a->f22 * b->f32 + a->f32 * b->f33 + a->f42 * b->f34;
+  m.f42 = a->f12 * b->f41 + a->f22 * b->f42 + a->f32 * b->f43 + a->f42 * b->f44;
+
+  m.f13 = a->f13 * b->f11 + a->f23 * b->f12 + a->f33 * b->f13 + a->f43 * b->f14;
+  m.f23 = a->f13 * b->f21 + a->f23 * b->f22 + a->f33 * b->f23 + a->f43 * b->f24;
+  m.f33 = a->f13 * b->f31 + a->f23 * b->f32 + a->f33 * b->f33 + a->f43 * b->f34;
+  m.f43 = a->f13 * b->f41 + a->f23 * b->f42 + a->f33 * b->f43 + a->f43 * b->f44;
+
+  m.f14 = a->f14 * b->f11 + a->f24 * b->f12 + a->f34 * b->f13 + a->f44 * b->f14;
+  m.f24 = a->f14 * b->f21 + a->f24 * b->f22 + a->f34 * b->f23 + a->f44 * b->f24;
+  m.f34 = a->f14 * b->f31 + a->f24 * b->f32 + a->f34 * b->f33 + a->f44 * b->f34;
+  m.f44 = a->f14 * b->f41 + a->f24 * b->f42 + a->f34 * b->f43 + a->f44 * b->f44;
   return m;
 }
 

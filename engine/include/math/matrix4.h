@@ -13,16 +13,16 @@
 /**
  * A 4x4 square matrix.
  *
- * Column major. Members are named f[row][column].
+ * Column major. Members are named f[col][row].
  * All can be accessed as an array with f[i].
  *
  * Member layout:
- * f11 f12 f13 f14
- * f21 f22 f23 f24
- * f31 f32 f33 f34
- * f41 f42 f43 f44
+ * f11 f21 f31 f41
+ * f12 f22 f32 f42
+ * f13 f23 f33 f43
+ * f14 f24 f34 f44
  *
- * Index Layout:
+ * Index Layout (transposed):
  * 00 04 08 12
  * 01 05 09 13
  * 02 06 10 14
