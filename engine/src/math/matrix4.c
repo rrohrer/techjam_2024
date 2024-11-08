@@ -374,9 +374,9 @@ struct Vector4 Matrix4_transform(struct Matrix4 const *m, struct Vector4 v) {
 struct Matrix4 Matrix4_translation(float x, float y, float z) {
   struct Matrix4 m = Matrix4_identity();
 
-  m.f14 = x;
-  m.f24 = y;
-  m.f34 = z;
+  m.f41 = x;
+  m.f42 = y;
+  m.f43 = z;
 
   return m;
 }

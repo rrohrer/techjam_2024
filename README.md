@@ -16,3 +16,10 @@ Game in C for the Tech gamejam techjam_2024
 - color pallet
 - color variation in shader
 - video of camera orbiting simple voxel patch
+
+only mat functions verified:
+- lookAt
+- perpective
+- mul
+
+Everthing is right handed column major

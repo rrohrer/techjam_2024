@@ -30,8 +30,8 @@ static void mainloop(void) {
       core.running = false;
   }
 
-  int width = core.graphics.width / 40;
-  int height = core.graphics.height / 40;
+  int width = core.graphics.width;
+  int height = core.graphics.height;
   //  struct Matrix4 m = Matrix4_orthographic(-width, width, -height, height);
   struct Matrix4 p =
       Matrix4_perspective(1.6f, (float)width / (float)height, 0.1f, 150.f);
