@@ -10,11 +10,12 @@ Game in C for the Tech gamejam techjam_2024
 ### 11/5
 - ~~clean out `graphics_context_new`~~
 - set up cube primitive
-- scale cube to 1.0
-- render cube per set voxel
-- n dot l lighting
+- ~~scale cube to 1.0~~
+- ~~render cube per set voxel~~
+- ~~n dot l lighting~~
 - color pallet
 - color variation in shader
+- vertex fog
 - video of camera orbiting simple voxel patch
 
 only mat functions verified:
@@ -26,6 +27,6 @@ Everthing is right handed column major
 
 
 lighting:
-- pass multiple matrices into v shader to get frag pos (pc and m)
-- pass ambient dir and light dir into shader
-- calculate light in shader
+- ~~pass multiple matrices into v shader to get frag pos (pc and m)~~
+- ~~pass ambient dir and light dir into shader~~
+- ~~calculate light in shader~~

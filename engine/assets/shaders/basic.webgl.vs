@@ -1,9 +1,17 @@
 #version 300 es
 in vec3 aPos;
+in vec3 aNormal;
 
-uniform mat4 transform;
+uniform mat4 view_proj;
+uniform mat4 model;
+
+out vec3 Normal;
+out vec3 FragPos;
 
 void main()
 {
-    gl_Position = transform * vec4(aPos.x, aPos.y, aPos.z, 1.0);
+    vec4 vert = vec4(aPos.x, aPos.y, aPos.z, 1.0);
+    gl_Position = view_proj * model * vert;
+    FragPos = vec3(model * vert);
+    Normal = aNormal;
 }

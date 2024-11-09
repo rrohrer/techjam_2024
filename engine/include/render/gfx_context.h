@@ -10,8 +10,13 @@ struct GraphicsContext {
   struct SDL_Window *window;
   struct Mesh cube;
   struct Shader basic_lighting;
-  uint32_t basic_lighting_transform;
+  uint32_t basic_lighting_view_proj;
+  uint32_t basic_lighting_model;
   uint32_t basic_lighting_color;
+  uint32_t basic_lighting_ambient_dir;
+  uint32_t basic_lighting_ambient_color;
+  uint32_t basic_lighting_light_pos;
+  uint32_t basic_lighting_light_color;
   uint32_t width;
   uint32_t height;
 };

@@ -6,6 +6,7 @@
 #include "gl.h"
 #include "math/matrix4.h"
 #include "math/vector4.h"
+#include "render/gfx_api.h"
 #include "render/gfx_context.h"
 #include "voxel/grid.h"
 
@@ -15,9 +16,17 @@
 
 #define UNREFERENCED_PARAMETER(x) (void)x
 
+struct World {
+  struct Vector4 ambient_dir;
+  struct Vector4 ambient_color;
+  struct Vector4 point_light_pos;
+  struct Vector4 point_light_color;
+};
+
 struct Core {
   struct GraphicsContext graphics;
   struct Grid grid;
+  struct World world;
   bool running;
 };
 
@@ -38,7 +47,16 @@ static void mainloop(void) {
   struct Matrix4 c = Matrix4_lookat(Vector4_new_point(10.f, 10.f, 10.f),
                                     Vector4_new_point(0.f, 0.f, 0.f),
                                     Vector4_new_vector(0.f, 1.f, 0.f));
-  struct Matrix4 m = Matrix4_multiply(&p, &c);
+  struct Matrix4 vp = Matrix4_multiply(&p, &c);
+  shader_set_matrix_uniform(core.graphics.basic_lighting_view_proj, &vp);
+  shader_set_vector_uniform(core.graphics.basic_lighting_ambient_color,
+                            &core.world.ambient_color);
+  shader_set_vector_uniform(core.graphics.basic_lighting_ambient_dir,
+                            &core.world.ambient_dir);
+  shader_set_vector_uniform(core.graphics.basic_lighting_light_pos,
+                            &core.world.point_light_pos);
+  shader_set_vector_uniform(core.graphics.basic_lighting_light_color,
+                            &core.world.point_light_color);
   glClearColor(0.2f, 0.3f, 0.3f, 1.f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -50,12 +68,10 @@ static void mainloop(void) {
       for (uint32_t x = 0; x < core.grid.size_x; ++x) {
         char voxel = grid_get(&core.grid, x, y, z);
         if (voxel != 0) {
-          struct Matrix4 translation = Matrix4_translation(
-              core.grid.origin.x + x, core.grid.origin.y + y,
-              core.grid.origin.z + z);
-          struct Matrix4 model = Matrix4_multiply(&m, &translation);
-          shader_set_matrix_uniform(core.graphics.basic_lighting_transform,
-                                    &model);
+          struct Matrix4 model = Matrix4_translation(core.grid.origin.x + x,
+                                                     core.grid.origin.y + y,
+                                                     core.grid.origin.z + z);
+          shader_set_matrix_uniform(core.graphics.basic_lighting_model, &model);
           // struct Vector4 player_color = {1.f, 0.5f, 0.2f, 0.f};
           shader_set_vector_uniform(core.graphics.basic_lighting_color,
                                     &core.grid.color_palette[(int)voxel]);
@@ -94,6 +110,11 @@ int main(int argc, char **argv) {
       grid_set(&core.grid, i, 0, j, counter % 2 + 1);
     }
   }
+
+  core.world.ambient_dir = Vector4_new_vector(-0.2f, -0.8f, 0.2f);
+  core.world.ambient_color = Vector4_new_vector(0.2f, 0.2f, 0.2f);
+  core.world.point_light_pos = Vector4_new_point(0.f, 1.f, 0.f);
+  core.world.point_light_color = Vector4_new_vector(1.f, 1.f, 1.f);
 
 #ifdef __EMSCRIPTEN__
   emscripten_set_main_loop(mainloop, 0, 1);

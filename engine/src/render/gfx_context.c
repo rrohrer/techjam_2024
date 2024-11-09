@@ -109,9 +109,18 @@ bool graphics_context_new(struct GraphicsContext *graphics) {
 
   shader_bind(&basic_lighting);
 
-  uint32_t basic_lighting_transform =
-      shader_get_uniform(&basic_lighting, "transform");
+  uint32_t basic_lighting_view_proj =
+      shader_get_uniform(&basic_lighting, "view_proj");
+  uint32_t basic_lighting_model = shader_get_uniform(&basic_lighting, "model");
   uint32_t basic_lighting_color = shader_get_uniform(&basic_lighting, "color");
+  uint32_t basic_lighting_ambient_dir =
+      shader_get_uniform(&basic_lighting, "ambient_dir");
+  uint32_t basic_lighting_ambient_color =
+      shader_get_uniform(&basic_lighting, "ambient_color");
+  uint32_t basic_lighting_light_pos =
+      shader_get_uniform(&basic_lighting, "light_pos");
+  uint32_t basic_lighting_light_color =
+      shader_get_uniform(&basic_lighting, "light_color");
   SDL_GL_SwapWindow(window);
 
   *graphics = (struct GraphicsContext){
@@ -120,7 +129,12 @@ bool graphics_context_new(struct GraphicsContext *graphics) {
       .height = height,
       .basic_lighting = basic_lighting,
       .basic_lighting_color = basic_lighting_color,
-      .basic_lighting_transform = basic_lighting_transform,
+      .basic_lighting_ambient_dir = basic_lighting_ambient_dir,
+      .basic_lighting_ambient_color = basic_lighting_ambient_color,
+      .basic_lighting_light_pos = basic_lighting_light_pos,
+      .basic_lighting_light_color = basic_lighting_light_color,
+      .basic_lighting_view_proj = basic_lighting_view_proj,
+      .basic_lighting_model = basic_lighting_model,
       .cube = cube};
   return true;
 }
