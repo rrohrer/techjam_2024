@@ -28,6 +28,9 @@ struct Vector4 {
  */
 struct Vector4 Vector4_new_point(float x, float y, float z);
 
+#define Vector4_new_color(r, g, b)                                             \
+  Vector4_new_point(0x##r / 255.f, 0x##g / 255.f, 0x##b / 255.f)
+
 /**
  * Constructor for a 4D vector (x, y, z, 0)
  *

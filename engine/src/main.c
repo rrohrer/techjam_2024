@@ -6,6 +6,7 @@
 #include "gl.h"
 #include "math/matrix4.h"
 #include "math/vector4.h"
+#include "render/colors.h"
 #include "render/gfx_api.h"
 #include "render/gfx_context.h"
 #include "voxel/grid.h"
@@ -70,7 +71,8 @@ static void mainloop(void) {
       Vector4_new_vector(core.world.fog_start, core.world.fog_end, 0.f);
   shader_set_vector_uniform(core.graphics.basic_lighting_fog_props, &fog_props);
 
-  glClearColor(0.2f, 0.3f, 0.3f, 1.f);
+  glClearColor(core.world.fog_color.x, core.world.fog_color.y,
+               core.world.fog_color.z, 1.f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   shader_bind(&core.graphics.basic_lighting);
@@ -128,7 +130,7 @@ int main(int argc, char **argv) {
   core.world.ambient_color = Vector4_new_vector(0.2f, 0.2f, 0.2f);
   core.world.point_light_pos = Vector4_new_point(0.f, 4.f, 0.f);
   core.world.point_light_color = Vector4_new_vector(1.f, 1.f, 1.f);
-  core.world.fog_color = Vector4_new_point(0.2f, 0.3f, 0.3f);
+  core.world.fog_color = GREEN_DARK;
   core.world.fog_start = 10.f;
   core.world.fog_end = 30.f;
   core.world.camera_eye = Vector4_new_point(10.f, 10.f, 10.f);

@@ -1,5 +1,5 @@
 #include "voxel/grid.h"
-
+#include "render/colors.h"
 #include <stdlib.h>
 
 struct Grid grid_new(uint32_t x, uint32_t y, uint32_t z,
@@ -7,8 +7,8 @@ struct Grid grid_new(uint32_t x, uint32_t y, uint32_t z,
   struct Grid result =
       (struct Grid){.origin = origin, .size_x = x, .size_y = y, .size_z = z};
   result.data = (char *)calloc(x * y * z, sizeof(char));
-  result.color_palette[1] = Vector4_new_point(1.0, 0.0, 0.0);
-  result.color_palette[2] = Vector4_new_point(0.0, 1.0, 0.0);
+  result.color_palette[GRID_BEIGE] = BEIGE;
+  result.color_palette[GRID_BEIGE_R] = BEIGE_R;
   return result;
 }
 

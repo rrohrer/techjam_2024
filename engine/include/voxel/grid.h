@@ -7,6 +7,18 @@
 
 #define GRID_MAX_COLORS 16
 
+#define GRID_EMPTY 0
+#define GRID_BEIGE 1
+#define GRID_BEIGE_R 2
+#define GRID_TAN 3
+#define GRID_MAUVE 4
+#define GRID_GREEN_BRIGHT 5
+#define GRID_GREEN_LIGHT 6
+#define GRID_GREEN 7
+#define GRID_GREEN_DARK 8
+#define GRID_ORANGE 9
+#define GRID_RED 10
+
 struct Grid {
   struct Vector4 origin;
   uint32_t size_x;
