@@ -9,6 +9,15 @@ struct Grid grid_new(uint32_t x, uint32_t y, uint32_t z,
   result.data = (char *)calloc(x * y * z, sizeof(char));
   result.color_palette[GRID_BEIGE] = BEIGE;
   result.color_palette[GRID_BEIGE_R] = BEIGE_R;
+  result.color_palette[GRID_TAN] = TAN;
+  result.color_palette[GRID_MAUVE] = MAUVE;
+  result.color_palette[GRID_GREEN_BRIGHT] = GREEN_BRIGHT;
+  result.color_palette[GRID_GREEN_LIGHT] = GREEN_LIGHT;
+  result.color_palette[GRID_GREEN] = GREEN;
+  result.color_palette[GRID_GREEN_DARK] = GREEN_DARK;
+  result.color_palette[GRID_ORANGE] = ORANGE;
+  result.color_palette[GRID_RED] = RED;
+
   return result;
 }
 

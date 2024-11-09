@@ -13,7 +13,7 @@ Game in C for the Tech gamejam techjam_2024
 - ~~scale cube to 1.0~~
 - ~~render cube per set voxel~~
 - ~~n dot l lighting~~
-- color pallet
+- ~~color pallet~~
 - color variation in shader
 - ~~vertex fog~~
 - video of camera orbiting simple voxel patch
@@ -30,3 +30,15 @@ lighting:
 - ~~pass multiple matrices into v shader to get frag pos (pc and m)~~
 - ~~pass ambient dir and light dir into shader~~
 - ~~calculate light in shader~~
+
+### 11/9
+- line drawing for editor
+- editor
+    - 3d picking
+    - line drawing
+    - layer select
+    - set element
+    - place collider
+    - place enemy / spawn
+    - place player
+
