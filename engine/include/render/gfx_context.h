@@ -17,6 +17,9 @@ struct GraphicsContext {
   uint32_t basic_lighting_ambient_color;
   uint32_t basic_lighting_light_pos;
   uint32_t basic_lighting_light_color;
+  uint32_t basic_lighting_camera_eye;
+  uint32_t basic_lighting_fog_color;
+  uint32_t basic_lighting_fog_props;
   uint32_t width;
   uint32_t height;
 };

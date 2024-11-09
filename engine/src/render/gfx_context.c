@@ -121,6 +121,13 @@ bool graphics_context_new(struct GraphicsContext *graphics) {
       shader_get_uniform(&basic_lighting, "light_pos");
   uint32_t basic_lighting_light_color =
       shader_get_uniform(&basic_lighting, "light_color");
+  uint32_t basic_lighting_camera_eye =
+      shader_get_uniform(&basic_lighting, "camera_eye");
+  uint32_t basic_lighting_fog_color =
+      shader_get_uniform(&basic_lighting, "fog_color");
+  uint32_t basic_lighting_fog_props =
+      shader_get_uniform(&basic_lighting, "fog_props");
+
   SDL_GL_SwapWindow(window);
 
   *graphics = (struct GraphicsContext){
@@ -133,6 +140,9 @@ bool graphics_context_new(struct GraphicsContext *graphics) {
       .basic_lighting_ambient_color = basic_lighting_ambient_color,
       .basic_lighting_light_pos = basic_lighting_light_pos,
       .basic_lighting_light_color = basic_lighting_light_color,
+      .basic_lighting_camera_eye = basic_lighting_camera_eye,
+      .basic_lighting_fog_color = basic_lighting_fog_color,
+      .basic_lighting_fog_props = basic_lighting_fog_props,
       .basic_lighting_view_proj = basic_lighting_view_proj,
       .basic_lighting_model = basic_lighting_model,
       .cube = cube};

@@ -15,7 +15,7 @@ Game in C for the Tech gamejam techjam_2024
 - ~~n dot l lighting~~
 - color pallet
 - color variation in shader
-- vertex fog
+- ~~vertex fog~~
 - video of camera orbiting simple voxel patch
 
 only mat functions verified:
