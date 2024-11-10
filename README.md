@@ -22,6 +22,10 @@ only mat functions verified:
 - lookAt
 - perpective
 - mul
+- get/set row/col
+- transpose
+- translation
+- transform
 
 Everthing is right handed column major
 
@@ -34,8 +38,8 @@ lighting:
 ### 11/9
 - line drawing for editor
 - editor
-    - simple mouse input
-    - simple keyboard inpud
+    - ~~simple mouse input~~
+    - ~~simple keyboard inpud~~
     - 3d picking
     - ~~line drawing~~
     - layer select

@@ -35,35 +35,35 @@ struct Matrix4 Matrix4_frustum(float left, float right, float bottom, float top,
 }
 
 struct Vector4 Matrix4_get_column1(struct Matrix4 const *m) {
-  return (struct Vector4){m->f11, m->f21, m->f31, m->f41};
-}
-
-struct Vector4 Matrix4_get_column2(struct Matrix4 const *m) {
-  return (struct Vector4){m->f12, m->f22, m->f32, m->f42};
-}
-
-struct Vector4 Matrix4_get_column3(struct Matrix4 const *m) {
-  return (struct Vector4){m->f13, m->f23, m->f33, m->f43};
-}
-
-struct Vector4 Matrix4_get_column4(struct Matrix4 const *m) {
-  return (struct Vector4){m->f14, m->f24, m->f34, m->f44};
-}
-
-struct Vector4 Matrix4_get_row1(struct Matrix4 const *m) {
   return (struct Vector4){m->f11, m->f12, m->f13, m->f14};
 }
 
-struct Vector4 Matrix4_get_row2(struct Matrix4 const *m) {
+struct Vector4 Matrix4_get_column2(struct Matrix4 const *m) {
   return (struct Vector4){m->f21, m->f22, m->f23, m->f24};
 }
 
-struct Vector4 Matrix4_get_row3(struct Matrix4 const *m) {
+struct Vector4 Matrix4_get_column3(struct Matrix4 const *m) {
   return (struct Vector4){m->f31, m->f32, m->f33, m->f34};
 }
 
-struct Vector4 Matrix4_get_row4(struct Matrix4 const *m) {
+struct Vector4 Matrix4_get_column4(struct Matrix4 const *m) {
   return (struct Vector4){m->f41, m->f42, m->f43, m->f44};
+}
+
+struct Vector4 Matrix4_get_row1(struct Matrix4 const *m) {
+  return (struct Vector4){m->f11, m->f21, m->f31, m->f41};
+}
+
+struct Vector4 Matrix4_get_row2(struct Matrix4 const *m) {
+  return (struct Vector4){m->f12, m->f22, m->f32, m->f42};
+}
+
+struct Vector4 Matrix4_get_row3(struct Matrix4 const *m) {
+  return (struct Vector4){m->f13, m->f23, m->f33, m->f43};
+}
+
+struct Vector4 Matrix4_get_row4(struct Matrix4 const *m) {
+  return (struct Vector4){m->f14, m->f24, m->f34, m->f44};
 }
 
 struct Matrix4 Matrix4_identity() {
@@ -296,57 +296,57 @@ struct Matrix4 Matrix4_rotation_z(float angle) {
 
 void Matrix4_set_column1(struct Matrix4 *m, struct Vector4 v) {
   m->f11 = v.x;
-  m->f21 = v.y;
-  m->f31 = v.z;
-  m->f41 = v.w;
-}
-
-void Matrix4_set_column2(struct Matrix4 *m, struct Vector4 v) {
-  m->f12 = v.x;
-  m->f22 = v.y;
-  m->f32 = v.z;
-  m->f42 = v.w;
-}
-
-void Matrix4_set_column3(struct Matrix4 *m, struct Vector4 v) {
-  m->f13 = v.x;
-  m->f23 = v.y;
-  m->f33 = v.z;
-  m->f43 = v.w;
-}
-
-void Matrix4_set_column4(struct Matrix4 *m, struct Vector4 v) {
-  m->f14 = v.x;
-  m->f24 = v.y;
-  m->f34 = v.z;
-  m->f44 = v.w;
-}
-
-void Matrix4_set_row1(struct Matrix4 *m, struct Vector4 v) {
-  m->f11 = v.x;
   m->f12 = v.y;
   m->f13 = v.z;
   m->f14 = v.w;
 }
 
-void Matrix4_set_row2(struct Matrix4 *m, struct Vector4 v) {
+void Matrix4_set_column2(struct Matrix4 *m, struct Vector4 v) {
   m->f21 = v.x;
   m->f22 = v.y;
   m->f23 = v.z;
   m->f24 = v.w;
 }
 
-void Matrix4_set_row3(struct Matrix4 *m, struct Vector4 v) {
+void Matrix4_set_column3(struct Matrix4 *m, struct Vector4 v) {
   m->f31 = v.x;
   m->f32 = v.y;
   m->f33 = v.z;
   m->f34 = v.w;
 }
 
-void Matrix4_set_row4(struct Matrix4 *m, struct Vector4 v) {
+void Matrix4_set_column4(struct Matrix4 *m, struct Vector4 v) {
   m->f41 = v.x;
   m->f42 = v.y;
   m->f43 = v.z;
+  m->f44 = v.w;
+}
+
+void Matrix4_set_row1(struct Matrix4 *m, struct Vector4 v) {
+  m->f11 = v.x;
+  m->f21 = v.y;
+  m->f31 = v.z;
+  m->f41 = v.w;
+}
+
+void Matrix4_set_row2(struct Matrix4 *m, struct Vector4 v) {
+  m->f12 = v.x;
+  m->f22 = v.y;
+  m->f32 = v.z;
+  m->f42 = v.w;
+}
+
+void Matrix4_set_row3(struct Matrix4 *m, struct Vector4 v) {
+  m->f13 = v.x;
+  m->f23 = v.y;
+  m->f33 = v.z;
+  m->f43 = v.w;
+}
+
+void Matrix4_set_row4(struct Matrix4 *m, struct Vector4 v) {
+  m->f14 = v.x;
+  m->f24 = v.y;
+  m->f34 = v.z;
   m->f44 = v.w;
 }
 
@@ -363,10 +363,10 @@ struct Matrix4 Matrix4_scale(float x, float y, float z) {
 struct Vector4 Matrix4_transform(struct Matrix4 const *m, struct Vector4 v) {
   struct Vector4 r;
 
-  r.x = m->f11 * v.x + m->f12 * v.y + m->f13 * v.z + m->f14 * v.w;
-  r.y = m->f21 * v.x + m->f22 * v.y + m->f23 * v.z + m->f24 * v.w;
-  r.z = m->f31 * v.x + m->f32 * v.y + m->f33 * v.z + m->f34 * v.w;
-  r.w = m->f41 * v.x + m->f42 * v.y + m->f43 * v.z + m->f44 * v.w;
+  r.x = m->f11 * v.x + m->f21 * v.y + m->f31 * v.z + m->f41 * v.w;
+  r.y = m->f12 * v.x + m->f22 * v.y + m->f32 * v.z + m->f42 * v.w;
+  r.z = m->f13 * v.x + m->f23 * v.y + m->f33 * v.z + m->f43 * v.w;
+  r.w = m->f14 * v.x + m->f24 * v.y + m->f34 * v.z + m->f44 * v.w;
 
   return r;
 }
