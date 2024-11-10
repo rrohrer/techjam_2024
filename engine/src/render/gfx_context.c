@@ -107,6 +107,9 @@ bool graphics_context_new(struct GraphicsContext *graphics) {
     return false;
   }
 
+  file_free(&vs);
+  file_free(&fs);
+
   shader_bind(&basic_lighting);
 
   uint32_t basic_lighting_view_proj =

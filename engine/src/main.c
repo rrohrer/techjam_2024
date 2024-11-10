@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "core/debug.h"
 #include "gl.h"
 #include "math/matrix4.h"
 #include "math/vector4.h"
@@ -33,6 +34,7 @@ struct Core {
   struct GraphicsContext graphics;
   struct Grid grid;
   struct World world;
+  struct Debug debug;
   bool running;
 };
 
@@ -44,16 +46,25 @@ static void mainloop(void) {
     if (e.type == SDL_QUIT)
       core.running = false;
   }
+  // start the frame
+  glClearColor(core.world.fog_color.x, core.world.fog_color.y,
+               core.world.fog_color.z, 1.f);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glDepthMask(GL_TRUE);
+  glEnable(GL_DEPTH_TEST);
 
   int width = core.graphics.width;
   int height = core.graphics.height;
-  //  struct Matrix4 m = Matrix4_orthographic(-width, width, -height, height);
+
   struct Matrix4 p =
       Matrix4_perspective(1.6f, (float)width / (float)height, 0.1f, 150.f);
   struct Matrix4 c =
       Matrix4_lookat(core.world.camera_eye, core.world.camera_target,
                      Vector4_new_vector(0.f, 1.f, 0.f));
   struct Matrix4 vp = Matrix4_multiply(&p, &c);
+
+  // render the scene
+  shader_bind(&core.graphics.basic_lighting);
   shader_set_matrix_uniform(core.graphics.basic_lighting_view_proj, &vp);
   shader_set_vector_uniform(core.graphics.basic_lighting_ambient_color,
                             &core.world.ambient_color);
@@ -71,11 +82,6 @@ static void mainloop(void) {
       Vector4_new_vector(core.world.fog_start, core.world.fog_end, 0.f);
   shader_set_vector_uniform(core.graphics.basic_lighting_fog_props, &fog_props);
 
-  glClearColor(core.world.fog_color.x, core.world.fog_color.y,
-               core.world.fog_color.z, 1.f);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-  shader_bind(&core.graphics.basic_lighting);
   mesh_bind(&core.graphics.cube);
 
   for (uint32_t z = 0; z < core.grid.size_z; ++z) {
@@ -95,6 +101,11 @@ static void mainloop(void) {
       }
     }
   }
+
+  // update debug
+  debug_add_aabb(&core.debug, Vector4_new_point(0.f, 0.f, 0.f),
+                 Vector4_new_vector(2.5f, 2.5f, 2.5f), RED);
+  debug_update(&core.debug, &vp);
 
   SDL_GL_SwapWindow(core.graphics.window);
 }
@@ -135,6 +146,8 @@ int main(int argc, char **argv) {
   core.world.fog_end = 30.f;
   core.world.camera_eye = Vector4_new_point(10.f, 10.f, 10.f);
   core.world.camera_target = Vector4_new_point(0.f, 0.f, 0.f);
+
+  core.debug = debug_new();
 
 #ifdef __EMSCRIPTEN__
   emscripten_set_main_loop(mainloop, 0, 1);

@@ -35,7 +35,7 @@ lighting:
 - line drawing for editor
 - editor
     - 3d picking
-    - line drawing
+    - ~~line drawing~~
     - layer select
     - set element
     - place collider
