@@ -11,6 +11,8 @@ void input_update(struct Input *input) {
       input->key_state[i] = (input->key_state[i] + 1) % KEYSTATE_COUNT;
     }
   }
+
+  input->mouse_moved = false;
 }
 
 void input_register_keypress(struct Input *input, enum Keycode keycode) {
@@ -19,6 +21,16 @@ void input_register_keypress(struct Input *input, enum Keycode keycode) {
 
 void input_register_keyup(struct Input *input, enum Keycode keycode) {
   input->key_state[keycode] = KEYSTATE_UP;
+}
+
+void input_register_mousemove(struct Input *input, uint32_t x, uint32_t y,
+                              uint32_t width, uint32_t height) {
+  input->mouse_moved = true;
+  input->is_mouse_valid = true;
+
+  // translate this into GL style NDC
+  input->mouse_pos.x = 2.f * ((x / (float)width) - 0.5f);
+  input->mouse_pos.y = -2.f * ((y / (float)height) - 0.5f);
 }
 
 bool input_is_key_active(const struct Input *input, enum Keycode key) {

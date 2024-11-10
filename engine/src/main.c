@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "SDL_events.h"
 #include "core/debug.h"
 #include "core/input.h"
 #include "gl.h"
@@ -60,6 +61,9 @@ static void mainloop(void) {
     case SDL_KEYUP:
       input_register_keyup(&core.input,
                            input_translate_sdlkey(e.key.keysym.sym));
+    case SDL_MOUSEMOTION:
+      input_register_mousemove(&core.input, e.motion.x, e.motion.y,
+                               core.graphics.width, core.graphics.height);
     default:
       break;
     };
@@ -67,6 +71,11 @@ static void mainloop(void) {
 
   if (input_is_key_active(&core.input, KEYCODE_W)) {
     printf("W to win!\n");
+  }
+
+  if (core.input.mouse_moved) {
+    printf("x: %f     y: %f\n ", core.input.mouse_pos.x,
+           core.input.mouse_pos.y);
   }
 
   // start rendering the frame
