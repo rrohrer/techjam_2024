@@ -1,4 +1,5 @@
 #include "math/matrix4.h"
+#include "math/vector4.h"
 
 #include <math.h>
 
@@ -77,8 +78,37 @@ struct Matrix4 Matrix4_identity() {
 
 // This is taken from:
 // http://www.cg.info.hiroshima-cu.ac.jp/~miyazaki/knowledge/teche23.html
+// updated with a special case for graphics from here:
+// https://stackoverflow.com/questions/155670/invert-4x4-matrix-numerical-most-stable-solution-needed
+/*
+[ux vx wx tx]
+[uy vy wy ty]
+[uz vz wz tz]
+[ 0  0  0  1]
+(assuming a composition of rotation, scale, translation matrices)
+
+then there's an easily-derivable direct formula, which is
+
+[ux uy uz -dot(u,t)]
+[vx vy vz -dot(v,t)]
+[wx wy wz -dot(w,t)]
+[ 0  0  0     1    ]
+*/
 struct Matrix4 Matrix4_invert(struct Matrix4 const *m) {
-  float det = Matrix4_determinant(m);
+  struct Matrix4 b = Matrix4_transpose(m);
+  struct Vector4 u = Matrix4_get_column1(m);
+  struct Vector4 v = Matrix4_get_column2(m);
+  struct Vector4 w = Matrix4_get_column3(m);
+  struct Vector4 t = Matrix4_get_column4(m);
+  b.f14 = 0.f;
+  b.f24 = 0.f;
+  b.f34 = 0.f;
+  b.f44 = 1.f;
+  b.f41 = -Vector4_dot(u, t);
+  b.f42 = -Vector4_dot(v, t);
+  b.f43 = -Vector4_dot(w, t);
+  return b;
+  /*float det = Matrix4_determinant(m);
   if (det == 0.f) {
     return Matrix4_identity();
   }
@@ -146,7 +176,7 @@ struct Matrix4 Matrix4_invert(struct Matrix4 const *m) {
   b.f43 = b43 * inv_det;
   b.f44 = b44 * inv_det;
 
-  return b;
+  return b;*/
 }
 
 struct Matrix4 Matrix4_lookat(struct Vector4 eye, struct Vector4 target,

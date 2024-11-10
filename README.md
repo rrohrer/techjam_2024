@@ -26,6 +26,7 @@ only mat functions verified:
 - transpose
 - translation
 - transform
+- invert
 
 Everthing is right handed column major
 
