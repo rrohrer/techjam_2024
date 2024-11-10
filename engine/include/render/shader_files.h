@@ -3,17 +3,17 @@
 
 #ifdef __EMSCRIPTEN__
 
-#define BASIC_VS_PATH "assets/shaders/basic.webgl.vs"
-#define BASIC_FS_PATH "assets/shaders/basic.webgl.fs"
-#define LINE_VS_PATH "assets/shaders/line.webgl.vs"
-#define LINE_FS_PATH "assets/shaders/line.webgl.fs"
+#define BASIC_VS_PATH "assets/shaders/basic.webgl.vert"
+#define BASIC_FS_PATH "assets/shaders/basic.webgl.frag"
+#define LINE_VS_PATH "assets/shaders/line.webgl.vert"
+#define LINE_FS_PATH "assets/shaders/line.webgl.frag"
 
 #else
 
-#define BASIC_VS_PATH "assets/shaders/basic.gl.vs"
-#define BASIC_FS_PATH "assets/shaders/basic.gl.fs"
-#define LINE_VS_PATH "assets/shaders/line.gl.vs"
-#define LINE_FS_PATH "assets/shaders/line.gl.fs"
+#define BASIC_VS_PATH "assets/shaders/basic.gl.vert"
+#define BASIC_FS_PATH "assets/shaders/basic.gl.frag"
+#define LINE_VS_PATH "assets/shaders/line.gl.vert"
+#define LINE_FS_PATH "assets/shaders/line.gl.frag"
 
 #endif
 
