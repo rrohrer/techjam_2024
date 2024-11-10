@@ -4,6 +4,7 @@
 #include <stdlib.h>
 
 #include "core/debug.h"
+#include "core/input.h"
 #include "gl.h"
 #include "math/matrix4.h"
 #include "math/vector4.h"
@@ -31,22 +32,44 @@ struct World {
 };
 
 struct Core {
+  struct Debug debug;
   struct GraphicsContext graphics;
   struct Grid grid;
+  struct Input input;
   struct World world;
-  struct Debug debug;
   bool running;
 };
 
 static struct Core core;
 
 static void mainloop(void) {
+  // update input before processing new events
+  input_update(&core.input);
+
+  // process input from SDL
   SDL_Event e;
   while (SDL_PollEvent(&e)) {
-    if (e.type == SDL_QUIT)
+    switch (e.type) {
+    case SDL_QUIT:
       core.running = false;
+      break;
+    case SDL_KEYDOWN:
+      input_register_keypress(&core.input,
+                              input_translate_sdlkey(e.key.keysym.sym));
+      break;
+    case SDL_KEYUP:
+      input_register_keyup(&core.input,
+                           input_translate_sdlkey(e.key.keysym.sym));
+    default:
+      break;
+    };
   }
-  // start the frame
+
+  if (input_is_key_active(&core.input, KEYCODE_W)) {
+    printf("W to win!\n");
+  }
+
+  // start rendering the frame
   glClearColor(core.world.fog_color.x, core.world.fog_color.y,
                core.world.fog_color.z, 1.f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -93,7 +116,6 @@ static void mainloop(void) {
                                                      core.grid.origin.y + y,
                                                      core.grid.origin.z + z);
           shader_set_matrix_uniform(core.graphics.basic_lighting_model, &model);
-          // struct Vector4 player_color = {1.f, 0.5f, 0.2f, 0.f};
           shader_set_vector_uniform(core.graphics.basic_lighting_color,
                                     &core.grid.color_palette[(int)voxel]);
           glDrawArrays(GL_TRIANGLES, 0, CUBE_TRIGANGLE_COUNT);
@@ -148,6 +170,7 @@ int main(int argc, char **argv) {
   core.world.camera_target = Vector4_new_point(0.f, 0.f, 0.f);
 
   core.debug = debug_new();
+  core.input = input_new();
 
 #ifdef __EMSCRIPTEN__
   emscripten_set_main_loop(mainloop, 0, 1);

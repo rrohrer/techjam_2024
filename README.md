@@ -34,6 +34,8 @@ lighting:
 ### 11/9
 - line drawing for editor
 - editor
+    - simple mouse input
+    - simple keyboard inpud
     - 3d picking
     - ~~line drawing~~
     - layer select
