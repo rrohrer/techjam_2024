@@ -2,6 +2,8 @@
 #include "math/vector4.h"
 
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 float Matrix4_determinant(struct Matrix4 const *m) {
   float d1 = m->f22 * (m->f33 * m->f44 - m->f34 * m->f43) -
@@ -93,8 +95,65 @@ then there's an easily-derivable direct formula, which is
 [vx vy vz -dot(v,t)]
 [wx wy wz -dot(w,t)]
 [ 0  0  0     1    ]
+
+impl 3 is from here:
+https://stackoverflow.com/questions/1148309/inverting-a-4x4-matrix
 */
 struct Matrix4 Matrix4_invert(struct Matrix4 const *m) {
+
+  // Implementation 3
+  float inv[16], det;
+  int i;
+
+#define m m->f
+
+  inv[0] = m[5] * m[10] * m[15] - m[5] * m[11] * m[14] - m[9] * m[6] * m[15] +
+           m[9] * m[7] * m[14] + m[13] * m[6] * m[11] - m[13] * m[7] * m[10];
+  inv[4] = -m[4] * m[10] * m[15] + m[4] * m[11] * m[14] + m[8] * m[6] * m[15] -
+           m[8] * m[7] * m[14] - m[12] * m[6] * m[11] + m[12] * m[7] * m[10];
+  inv[8] = m[4] * m[9] * m[15] - m[4] * m[11] * m[13] - m[8] * m[5] * m[15] +
+           m[8] * m[7] * m[13] + m[12] * m[5] * m[11] - m[12] * m[7] * m[9];
+  inv[12] = -m[4] * m[9] * m[14] + m[4] * m[10] * m[13] + m[8] * m[5] * m[14] -
+            m[8] * m[6] * m[13] - m[12] * m[5] * m[10] + m[12] * m[6] * m[9];
+  inv[1] = -m[1] * m[10] * m[15] + m[1] * m[11] * m[14] + m[9] * m[2] * m[15] -
+           m[9] * m[3] * m[14] - m[13] * m[2] * m[11] + m[13] * m[3] * m[10];
+  inv[5] = m[0] * m[10] * m[15] - m[0] * m[11] * m[14] - m[8] * m[2] * m[15] +
+           m[8] * m[3] * m[14] + m[12] * m[2] * m[11] - m[12] * m[3] * m[10];
+  inv[9] = -m[0] * m[9] * m[15] + m[0] * m[11] * m[13] + m[8] * m[1] * m[15] -
+           m[8] * m[3] * m[13] - m[12] * m[1] * m[11] + m[12] * m[3] * m[9];
+  inv[13] = m[0] * m[9] * m[14] - m[0] * m[10] * m[13] - m[8] * m[1] * m[14] +
+            m[8] * m[2] * m[13] + m[12] * m[1] * m[10] - m[12] * m[2] * m[9];
+  inv[2] = m[1] * m[6] * m[15] - m[1] * m[7] * m[14] - m[5] * m[2] * m[15] +
+           m[5] * m[3] * m[14] + m[13] * m[2] * m[7] - m[13] * m[3] * m[6];
+  inv[6] = -m[0] * m[6] * m[15] + m[0] * m[7] * m[14] + m[4] * m[2] * m[15] -
+           m[4] * m[3] * m[14] - m[12] * m[2] * m[7] + m[12] * m[3] * m[6];
+  inv[10] = m[0] * m[5] * m[15] - m[0] * m[7] * m[13] - m[4] * m[1] * m[15] +
+            m[4] * m[3] * m[13] + m[12] * m[1] * m[7] - m[12] * m[3] * m[5];
+  inv[14] = -m[0] * m[5] * m[14] + m[0] * m[6] * m[13] + m[4] * m[1] * m[14] -
+            m[4] * m[2] * m[13] - m[12] * m[1] * m[6] + m[12] * m[2] * m[5];
+  inv[3] = -m[1] * m[6] * m[11] + m[1] * m[7] * m[10] + m[5] * m[2] * m[11] -
+           m[5] * m[3] * m[10] - m[9] * m[2] * m[7] + m[9] * m[3] * m[6];
+  inv[7] = m[0] * m[6] * m[11] - m[0] * m[7] * m[10] - m[4] * m[2] * m[11] +
+           m[4] * m[3] * m[10] + m[8] * m[2] * m[7] - m[8] * m[3] * m[6];
+  inv[11] = -m[0] * m[5] * m[11] + m[0] * m[7] * m[9] + m[4] * m[1] * m[11] -
+            m[4] * m[3] * m[9] - m[8] * m[1] * m[7] + m[8] * m[3] * m[5];
+  inv[15] = m[0] * m[5] * m[10] - m[0] * m[6] * m[9] - m[4] * m[1] * m[10] +
+            m[4] * m[2] * m[9] + m[8] * m[1] * m[6] - m[8] * m[2] * m[5];
+
+  det = m[0] * inv[0] + m[1] * inv[4] + m[2] * inv[8] + m[3] * inv[12];
+  if (det == 0) {
+
+    printf("Unable to invert matrix\n");
+    exit(1);
+  }
+  det = 1.0 / det;
+  struct Matrix4 invOut;
+  for (i = 0; i < 16; i++)
+    invOut.f[i] = inv[i] * det;
+#undef m
+  return invOut;
+
+  /*  IMPLEMENTATION 1
   struct Matrix4 b = Matrix4_transpose(m);
   struct Vector4 u = Matrix4_get_column1(m);
   struct Vector4 v = Matrix4_get_column2(m);
@@ -108,7 +167,10 @@ struct Matrix4 Matrix4_invert(struct Matrix4 const *m) {
   b.f42 = -Vector4_dot(v, t);
   b.f43 = -Vector4_dot(w, t);
   return b;
-  /*float det = Matrix4_determinant(m);
+  */
+
+  /* IMPLEMENTATION 2
+  float det = Matrix4_determinant(m);
   if (det == 0.f) {
     return Matrix4_identity();
   }
@@ -176,7 +238,8 @@ struct Matrix4 Matrix4_invert(struct Matrix4 const *m) {
   b.f43 = b43 * inv_det;
   b.f44 = b44 * inv_det;
 
-  return b;*/
+  return b;
+  */
 }
 
 struct Matrix4 Matrix4_lookat(struct Vector4 eye, struct Vector4 target,

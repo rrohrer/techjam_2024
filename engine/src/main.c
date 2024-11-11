@@ -69,6 +69,7 @@ static void mainloop(void) {
     };
   }
 
+  /*
   if (input_is_key_active(&core.input, KEYCODE_W)) {
     printf("W to win!\n");
   }
@@ -77,6 +78,7 @@ static void mainloop(void) {
     printf("x: %f     y: %f\n ", core.input.mouse_pos.x,
            core.input.mouse_pos.y);
   }
+  */
 
   // start rendering the frame
   glClearColor(core.world.fog_color.x, core.world.fog_color.y,
@@ -89,11 +91,53 @@ static void mainloop(void) {
   int height = core.graphics.height;
 
   struct Matrix4 p =
-      Matrix4_perspective(1.6f, (float)width / (float)height, 0.1f, 150.f);
+      Matrix4_perspective(1.2f, (float)width / (float)height, 0.1f, 150.f);
   struct Matrix4 c =
       Matrix4_lookat(core.world.camera_eye, core.world.camera_target,
                      Vector4_new_vector(0.f, 1.f, 0.f));
   struct Matrix4 vp = Matrix4_multiply(&p, &c);
+
+  // test picking
+  if (core.input.is_mouse_valid) {
+    struct Vector4 ndc_far =
+        Vector4_new_point(core.input.mouse_pos.x, core.input.mouse_pos.y, 1.f);
+    struct Vector4 ndc_near =
+        Vector4_new_point(core.input.mouse_pos.x, core.input.mouse_pos.y, -1.f);
+    struct Matrix4 ivp = Matrix4_invert(&vp);
+    struct Vector4 world_far = Matrix4_transform(&ivp, ndc_far);
+    world_far = Vector4_scale(world_far, 1.f / world_far.w);
+    struct Vector4 world_near = Matrix4_transform(&ivp, ndc_near);
+    world_near = Vector4_scale(world_near, 1.f / world_near.w);
+    printf("world_near: %f %f %f %f\n", world_near.x, world_near.y,
+           world_near.z, world_near.w);
+    printf("world_far: %f %f %f %f\n", world_far.x, world_far.y, world_far.z,
+           world_far.w);
+    struct Vector4 world_dir = Vector4_subtract(world_far, world_near);
+    printf("world_dir: %f %f %f\n", world_dir.x, world_dir.y, world_dir.z);
+    Vector4_normalize(&world_dir);
+    printf("|world_dir|: %f %f %f\n", world_dir.x, world_dir.y, world_dir.z);
+
+    // struct Vector4 plane_o = Vector4_new_point(0.f, 0.f, 0.f);
+    struct Vector4 plane_n = Vector4_new_vector(0.f, 1.f, 0.f);
+
+    float wdotn = Vector4_dot(world_dir, plane_n);
+    if (wdotn != 0.f) {
+      float t = -Vector4_dot(world_near, plane_n) / wdotn;
+      if (t > 0.f) {
+        struct Vector4 s = Vector4_scale(world_dir, t);
+        struct Vector4 hit = Vector4_add(world_near, s);
+        printf("hit: %f %f %f %f\n", hit.x, hit.y, hit.z, t);
+        struct Vector4 grid = Vector4_subtract(hit, core.grid.origin);
+        uint32_t x = (uint32_t)grid.x;
+        uint32_t y = (uint32_t)grid.y;
+        uint32_t z = (uint32_t)grid.z;
+        if (x < core.grid.size_x && y < core.grid.size_y &&
+            z < core.grid.size_z) {
+          grid_set(&core.grid, x, y, z, GRID_ORANGE);
+        }
+      }
+    }
+  }
 
   // render the scene
   shader_bind(&core.graphics.basic_lighting);
