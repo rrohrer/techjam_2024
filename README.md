@@ -41,7 +41,7 @@ lighting:
 - editor
     - ~~simple mouse input~~
     - ~~simple keyboard inpud~~
-    - 3d picking
+    - ~~3d picking~~
     - ~~line drawing~~
     - layer select
     - set element
